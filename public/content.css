@@ -1,0 +1,44 @@
+/* AutoTranslate Hover - Tooltip Styles */
+#hover-translate-tooltip {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+  font-size: 14px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+  max-width: 350px !important;
+  min-width: 120px !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease !important;
+  pointer-events: auto !important;
+  line-height: 1.4 !important;
+  text-align: left !important;
+  word-wrap: break-word !important;
+}
+
+#hover-translate-tooltip .original {
+  font-size: 12px !important;
+  opacity: 0.85 !important;
+  margin-bottom: 6px !important;
+  padding-bottom: 6px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.2) !important;
+  color: white !important;
+}
+
+#hover-translate-tooltip .translation {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: white !important;
+}
+
+#hover-translate-tooltip .loading {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: white !important;
+}

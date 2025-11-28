@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "AutoTranslate Hover",
+  "version": "1.0.0",
+  "description": "Автоматичний переклад тексту при наведенні курсора",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}
