@@ -112,6 +112,7 @@
   document.addEventListener('mousedown', () => {
     const selection = window.getSelection();
     selectionStartText = selection ? selection.toString().trim() : '';
+    lastTranslatedText = '';
     hideTooltip();
   });
 
