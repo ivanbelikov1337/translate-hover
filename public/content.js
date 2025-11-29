@@ -2,13 +2,39 @@
 (function() {
   'use strict';
 
+  const supportedLanguages = ['uk', 'en', 'de', 'fr', 'es', 'it', 'pl', 'ja', 'zh', 'ko'];
+  
+  const getBrowserLanguage = () => {
+    const browserLang = navigator.language.split('-')[0];
+    return supportedLanguages.includes(browserLang) ? browserLang : 'en';
+  };
+
   let isEnabled = true;
-  let targetLang = 'uk';
+  let targetLang = getBrowserLanguage();
   let isTranslating = false;
+  let lastTranslatedText = '';
+  let selectionStartText = '';
+
+  const translations = {
+    uk: 'Перекладаю...',
+    en: 'Translating...',
+    de: 'Übersetze...',
+    fr: 'Traduction...',
+    es: 'Traduciendo...',
+    it: 'Traduzione...',
+    pl: 'Tłumaczenie...',
+    ja: '翻訳中...',
+    zh: '翻译中...',
+    ko: '번역 중...'
+  };
+
+  const getLoadingText = () => translations[targetLang] || translations.en;
 
   chrome.storage.sync.get(['enabled', 'targetLang'], (result) => {
     isEnabled = result.enabled !== false;
-    targetLang = result.targetLang || 'uk';
+    if (result.targetLang) {
+      targetLang = result.targetLang;
+    }
   });
 
   chrome.storage.onChanged.addListener((changes) => {
@@ -83,7 +109,13 @@
     }
   }
 
-  document.addEventListener('mouseup', async (e) => {
+  document.addEventListener('mousedown', () => {
+    const selection = window.getSelection();
+    selectionStartText = selection ? selection.toString().trim() : '';
+    hideTooltip();
+  });
+
+  async function handleSelection(e) {
     if (!isEnabled) return;
     
     const tooltipEl = document.getElementById('hover-translate-tooltip');
@@ -92,12 +124,19 @@
     const selection = window.getSelection();
     const selectedText = selection ? selection.toString().trim() : '';
     
-    if (!selectedText || selectedText.length < 2) return;
+    const isNewSelection = selectedText && selectedText !== selectionStartText;
+    
+    if (!selectedText || selectedText.length < 2 || !isNewSelection) {
+      return;
+    }
+    
+    if (selectedText === lastTranslatedText) return;
     if (isTranslating) return;
     
     isTranslating = true;
+    lastTranslatedText = selectedText;
     
-    showTooltip('⏳ Перекладаю...', e.clientX, e.clientY);
+    showTooltip(`⏳ ${getLoadingText()}`, e.clientX, e.clientY);
     
     const translation = await translateText(selectedText);
     
@@ -111,7 +150,10 @@
     }
     
     isTranslating = false;
-  });
+  }
+
+  document.addEventListener('mouseup', handleSelection);
+  document.addEventListener('dblclick', handleSelection);
 
   document.addEventListener('scroll', () => hideTooltip(), true);
 
