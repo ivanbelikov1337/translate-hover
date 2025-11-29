@@ -28,7 +28,21 @@
     ko: '번역 중...'
   };
 
+  const sameLanguageTexts = {
+    uk: 'Мова тексту збігається з мовою перекладу',
+    en: 'Source language matches target language',
+    de: 'Quellsprache stimmt mit Zielsprache überein',
+    fr: 'La langue source correspond à la langue cible',
+    es: 'El idioma de origen coincide con el de destino',
+    it: 'La lingua di origine corrisponde a quella di destinazione',
+    pl: 'Język źródłowy odpowiada językowi docelowemu',
+    ja: '原文と翻訳先の言語が同じです',
+    zh: '源语言与目标语言相同',
+    ko: '원본 언어와 대상 언어가 같습니다'
+  };
+
   const getLoadingText = () => translations[targetLang] || translations.en;
+  const getSameLanguageText = () => sameLanguageTexts[targetLang] || sameLanguageTexts.en;
 
   chrome.storage.sync.get(['enabled', 'targetLang'], (result) => {
     isEnabled = result.enabled !== false;
@@ -147,7 +161,7 @@
         <div style="font-size:15px;font-weight:600;">${escapeHtml(translation)}</div>
       `, e.clientX, e.clientY);
     } else {
-      hideTooltip();
+      showTooltip(`<div style="font-size:13px;">⚠️ ${getSameLanguageText()}</div>`, e.clientX, e.clientY);
     }
     
     isTranslating = false;
