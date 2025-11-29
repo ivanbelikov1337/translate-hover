@@ -1,15 +1,13 @@
 // AutoTranslate Hover - Background Service Worker
 
-// Ініціалізація налаштувань при встановленні
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.set({
-    enabled: true,
-    targetLang: 'uk'
+  chrome.storage.sync.get(['enabled', 'targetLang'], (result) => {
+    if (result.enabled === undefined) {
+      chrome.storage.sync.set({ enabled: true });
+    }
   });
-  console.log('AutoTranslate Hover installed!');
 });
 
-// Обробка повідомлень від popup або content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getSettings') {
     chrome.storage.sync.get(['enabled', 'targetLang'], (result) => {

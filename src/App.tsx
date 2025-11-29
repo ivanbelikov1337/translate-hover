@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import './i18n'
 import './App.css'
 
 declare const chrome: {
@@ -23,19 +25,30 @@ const languages = [
   { code: 'ko', name: '한국어' },
 ]
 
+const supportedLanguages = languages.map(l => l.code)
+
+const getBrowserLanguage = (): string => {
+  const browserLang = navigator.language.split('-')[0]
+  return supportedLanguages.includes(browserLang) ? browserLang : 'en'
+}
+
 function App() {
+  const { t, i18n } = useTranslation()
   const [enabled, setEnabled] = useState(true)
-  const [targetLang, setTargetLang] = useState('uk')
+  const [targetLang, setTargetLang] = useState(getBrowserLanguage)
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     if (typeof chrome !== 'undefined' && chrome.storage) {
       chrome.storage.sync.get(['enabled', 'targetLang'], (result) => {
         setEnabled(result.enabled !== false)
-        setTargetLang((result.targetLang as string) || 'uk')
+        if (result.targetLang) {
+          setTargetLang(result.targetLang as string)
+          i18n.changeLanguage(result.targetLang as string)
+        }
       })
     }
-  }, [])
+  }, [i18n])
 
   const saveSettings = () => {
     if (typeof chrome !== 'undefined' && chrome.storage) {
@@ -53,17 +66,22 @@ function App() {
     return () => clearTimeout(timer)
   }, [enabled, targetLang])
 
+  const handleLanguageChange = (lang: string) => {
+    setTargetLang(lang)
+    i18n.changeLanguage(lang)
+  }
+
   return (
     <div className="popup-container">
       <header className="popup-header">
         <div className="logo">🌐</div>
-        <h1>AutoTranslate Hover</h1>
+        <h1>Hover Translate</h1>
       </header>
 
       <main className="popup-content">
         <div className="setting-item">
           <label className="toggle-label">
-            <span>Увімкнено</span>
+            <span>{t('enabled')}</span>
             <div className={`toggle ${enabled ? 'active' : ''}`} onClick={() => setEnabled(!enabled)}>
               <div className="toggle-slider"></div>
             </div>
@@ -71,11 +89,11 @@ function App() {
         </div>
 
         <div className="setting-item">
-          <label htmlFor="language">Мова перекладу:</label>
+          <label htmlFor="language">{t('targetLanguage')}</label>
           <select 
             id="language" 
             value={targetLang} 
-            onChange={(e) => setTargetLang(e.target.value)}
+            onChange={(e) => handleLanguageChange(e.target.value)}
             disabled={!enabled}
           >
             {languages.map((lang) => (
@@ -87,12 +105,12 @@ function App() {
         </div>
 
         <div className="info-box">
-          <p>💡 Наведіть курсор на слово для автоматичного перекладу</p>
+          <p>{t('hint')}</p>
         </div>
 
         {saved && (
           <div className="saved-notification">
-            ✓ Збережено
+            {t('saved')}
           </div>
         )}
       </main>
