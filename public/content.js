@@ -41,8 +41,22 @@
     ko: '원본 언어와 대상 언어가 같습니다'
   };
 
+  const textTooLongTexts = {
+    uk: 'Текст занадто довгий (макс. 500 символів)',
+    en: 'Text is too long (max 500 characters)',
+    de: 'Text ist zu lang (max. 500 Zeichen)',
+    fr: 'Le texte est trop long (max 500 caractères)',
+    es: 'El texto es demasiado largo (máx. 500 caracteres)',
+    it: 'Il testo è troppo lungo (max 500 caratteri)',
+    pl: 'Tekst jest za długi (maks. 500 znaków)',
+    ja: 'テキストが長すぎます（最大500文字）',
+    zh: '文本太长（最多500个字符）',
+    ko: '텍스트가 너무 깁니다 (최대 500자)'
+  };
+
   const getLoadingText = () => translations[targetLang] || translations.en;
   const getSameLanguageText = () => sameLanguageTexts[targetLang] || sameLanguageTexts.en;
+  const getTextTooLongText = () => textTooLongTexts[targetLang] || textTooLongTexts.en;
 
   chrome.storage.sync.get(['enabled', 'targetLang'], (result) => {
     isEnabled = result.enabled !== false;
@@ -205,6 +219,11 @@
     const isNewSelection = selectedText && selectedText !== selectionStartText;
     
     if (!selectedText || selectedText.length < 2 || !isNewSelection) {
+      return;
+    }
+
+    if (selectedText.length > 500) {
+      showTooltip(`<div style="font-size:13px;">⚠️ ${getTextTooLongText()}</div>`, e.clientX, e.clientY);
       return;
     }
     
