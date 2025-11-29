@@ -1,5 +1,6 @@
 {
   "enabled": "Enabled",
+  "disabled": "Disabled",
   "targetLanguage": "Target language:",
   "hint": "💡 Select text for automatic translation",
   "saved": "✓ Saved"

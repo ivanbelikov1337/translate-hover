@@ -1,5 +1,6 @@
 {
   "enabled": "Activé",
+  "disabled": "Désactivé",
   "targetLanguage": "Langue cible:",
   "hint": "💡 Sélectionnez le texte pour la traduction automatique",
   "saved": "✓ Enregistré"

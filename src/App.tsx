@@ -1,16 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSettingsStore } from './store'
 import './i18n'
 import './App.css'
-
-declare const chrome: {
-  storage: {
-    sync: {
-      get: (keys: string[], callback: (result: Record<string, unknown>) => void) => void
-      set: (items: Record<string, unknown>, callback?: () => void) => void
-    }
-  }
-}
 
 const languages = [
   { code: 'uk', name: 'Українська' },
@@ -25,50 +17,37 @@ const languages = [
   { code: 'ko', name: '한국어' },
 ]
 
-const supportedLanguages = languages.map(l => l.code)
-
-const getBrowserLanguage = (): string => {
-  const browserLang = navigator.language.split('-')[0]
-  return supportedLanguages.includes(browserLang) ? browserLang : 'en'
-}
-
 function App() {
   const { t, i18n } = useTranslation()
-  const [enabled, setEnabled] = useState(true)
-  const [targetLang, setTargetLang] = useState(getBrowserLanguage)
+  const { enabled, targetLang, isLoading, setEnabled, setTargetLang, loadSettings } = useSettingsStore()
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    if (typeof chrome !== 'undefined' && chrome.storage) {
-      chrome.storage.sync.get(['enabled', 'targetLang'], (result) => {
-        setEnabled(result.enabled !== false)
-        if (result.targetLang) {
-          setTargetLang(result.targetLang as string)
-          i18n.changeLanguage(result.targetLang as string)
-        }
-      })
-    }
-  }, [i18n])
+    loadSettings().then(() => {
+      const lang = useSettingsStore.getState().targetLang
+      i18n.changeLanguage(lang)
+    })
+  }, [i18n, loadSettings])
 
-  const saveSettings = () => {
-    if (typeof chrome !== 'undefined' && chrome.storage) {
-      chrome.storage.sync.set({ enabled, targetLang }, () => {
-        setSaved(true)
-        setTimeout(() => setSaved(false), 2000)
-      })
-    }
+  const handleToggle = () => {
+    setEnabled(!enabled)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 1000)
   }
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      saveSettings()
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [enabled, targetLang])
 
   const handleLanguageChange = (lang: string) => {
     setTargetLang(lang)
     i18n.changeLanguage(lang)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 1000)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="popup-container">
+        <div className="loading">Loading...</div>
+      </div>
+    )
   }
 
   return (
@@ -81,8 +60,8 @@ function App() {
       <main className="popup-content">
         <div className="setting-item">
           <label className="toggle-label">
-            <span>{t('enabled')}</span>
-            <div className={`toggle ${enabled ? 'active' : ''}`} onClick={() => setEnabled(!enabled)}>
+            <span>{enabled ? t('enabled') : t('disabled')}</span>
+            <div className={`toggle ${enabled ? 'active' : ''}`} onClick={handleToggle}>
               <div className="toggle-slider"></div>
             </div>
           </label>

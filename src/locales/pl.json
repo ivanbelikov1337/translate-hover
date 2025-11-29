@@ -1,5 +1,6 @@
 {
   "enabled": "Włączono",
+  "disabled": "Wyłączono",
   "targetLanguage": "Język docelowy:",
   "hint": "💡 Zaznacz tekst, aby przetłumaczyć automatycznie",
   "saved": "✓ Zapisano"
