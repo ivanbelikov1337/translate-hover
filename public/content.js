@@ -80,7 +80,7 @@
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
       max-width: 350px !important;
       min-width: 100px !important;
-      pointer-events: none !important;
+      pointer-events: auto !important;
       line-height: 1.4 !important;
       left: ${x}px !important;
       top: ${y + 25}px !important;
@@ -108,6 +108,25 @@
     return div.innerHTML;
   }
 
+  function speakText(text) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.name === 'Google US English');
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+    
+    window.speechSynthesis.speak(utterance);
+  }
+
+  if (typeof window.speechSynthesis !== 'undefined') {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
+
   async function translateText(text) {
     try {
       const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=autodetect|${targetLang}`;
@@ -123,7 +142,10 @@
     }
   }
 
-  document.addEventListener('mousedown', () => {
+  document.addEventListener('mousedown', (e) => {
+    const tooltipEl = document.getElementById('hover-translate-tooltip');
+    if (tooltipEl && tooltipEl.contains(e.target)) return;
+    
     const selection = window.getSelection();
     selectionStartText = selection ? selection.toString().trim() : '';
     lastTranslatedText = '';
@@ -157,9 +179,24 @@
     
     if (translation && translation.toLowerCase() !== selectedText.toLowerCase()) {
       showTooltip(`
-        <div style="font-size:12px;opacity:0.85;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.2);">${escapeHtml(selectedText)}</div>
+        <div style="font-size:12px;opacity:0.85;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span>${escapeHtml(selectedText)}</span>
+          <button id="hover-translate-speak" style="background:none;border:none;cursor:pointer;padding:2px;opacity:0.8;transition:opacity 0.2s;" title="Listen">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          </button>
+        </div>
         <div style="font-size:15px;font-weight:600;">${escapeHtml(translation)}</div>
       `, e.clientX, e.clientY);
+      
+      const speakBtn = document.getElementById('hover-translate-speak');
+      if (speakBtn) {
+        speakBtn.addEventListener('click', (evt) => {
+          evt.stopPropagation();
+          speakText(selectedText);
+        });
+        speakBtn.addEventListener('mouseenter', () => speakBtn.style.opacity = '1');
+        speakBtn.addEventListener('mouseleave', () => speakBtn.style.opacity = '0.8');
+      }
     } else {
       showTooltip(`<div style="font-size:13px;">⚠️ ${getSameLanguageText()}</div>`, e.clientX, e.clientY);
     }
