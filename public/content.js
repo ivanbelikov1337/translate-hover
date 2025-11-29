@@ -2,7 +2,7 @@
 (function() {
   'use strict';
 
-  const supportedLanguages = ['uk', 'en', 'de', 'fr', 'es', 'it', 'pl', 'ja', 'zh', 'ko'];
+  const supportedLanguages = ['uk', 'en', 'de', 'fr', 'es', 'it', 'pl', 'ja', 'zh', 'ko', 'ru'];
   
   const getBrowserLanguage = () => {
     const browserLang = navigator.language.split('-')[0];
@@ -25,7 +25,8 @@
     pl: 'Tłumaczenie...',
     ja: '翻訳中...',
     zh: '翻译中...',
-    ko: '번역 중...'
+    ko: '번역 중...',
+    ru: 'Перевожу...'
   };
 
   const sameLanguageTexts = {
@@ -38,7 +39,8 @@
     pl: 'Język źródłowy odpowiada językowi docelowemu',
     ja: '原文と翻訳先の言語が同じです',
     zh: '源语言与目标语言相同',
-    ko: '원본 언어와 대상 언어가 같습니다'
+    ko: '원본 언어와 대상 언어가 같습니다',
+    ru: 'Язык текста совпадает с языком перевода'
   };
 
   const textTooLongTexts = {
@@ -51,7 +53,8 @@
     pl: 'Tekst jest za długi (maks. 500 znaków)',
     ja: 'テキストが長すぎます（最大500文字）',
     zh: '文本太长（最多500个字符）',
-    ko: '텍스트가 너무 깁니다 (최대 500자)'
+    ko: '텍스트가 너무 깁니다 (최대 500자)',
+    ru: 'Текст слишком длинный (макс. 500 символов)'
   };
 
   const getLoadingText = () => translations[targetLang] || translations.en;

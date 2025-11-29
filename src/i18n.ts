@@ -11,6 +11,7 @@ import pl from './locales/pl.json'
 import ja from './locales/ja.json'
 import zh from './locales/zh.json'
 import ko from './locales/ko.json'
+import ru from './locales/ru.json'
 
 const resources = {
   uk: { translation: uk },
@@ -22,10 +23,11 @@ const resources = {
   pl: { translation: pl },
   ja: { translation: ja },
   zh: { translation: zh },
-  ko: { translation: ko }
+  ko: { translation: ko },
+  ru: { translation: ru }
 }
 
-const supportedLanguages = ['uk', 'en', 'de', 'fr', 'es', 'it', 'pl', 'ja', 'zh', 'ko']
+const supportedLanguages = ['uk', 'en', 'de', 'fr', 'es', 'it', 'pl', 'ja', 'zh', 'ko', 'ru']
 
 const getBrowserLanguage = (): string => {
   const browserLang = navigator.language.split('-')[0]

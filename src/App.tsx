@@ -15,6 +15,7 @@ const languages = [
   { code: 'ja', name: '日本語' },
   { code: 'zh', name: '中文' },
   { code: 'ko', name: '한국어' },
+  { code: 'ru', name: 'Русский' },
 ]
 
 function App() {
