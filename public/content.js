@@ -159,10 +159,13 @@
     'uk': 'Google русский'
   };
 
+  let isSlow = false;
+
   function speakText(text) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
+    utterance.rate = isSlow ? 0.5 : 0.9;
+    isSlow = !isSlow;
     
     const detectedLang = detectLanguage(text);
     const voices = window.speechSynthesis.getVoices();
@@ -249,6 +252,7 @@
       `, e.clientX, e.clientY);
       
       const speakBtn = document.getElementById('hover-translate-speak');
+      
       if (speakBtn) {
         speakBtn.addEventListener('click', (evt) => {
           evt.stopPropagation();
