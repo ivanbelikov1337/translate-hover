@@ -98,6 +98,7 @@
   }
 
   function hideTooltip() {
+    window.speechSynthesis.cancel();
     const el = document.getElementById('hover-translate-tooltip');
     if (el) el.remove();
   }
@@ -108,13 +109,53 @@
     return div.innerHTML;
   }
 
+  function detectLanguage(text) {
+    const patterns = {
+      'uk': /[іїєґ]/i,
+      'ru': /[ёъыэ]/i,
+      'ja': /[\u3040-\u309F\u30A0-\u30FF]/,
+      'zh': /[\u4E00-\u9FFF]/,
+      'ko': /[\uAC00-\uD7AF\u1100-\u11FF]/,
+      'de': /[äöüß]/i,
+      'fr': /[àâçéèêëîïôùûü]/i,
+      'es': /[ñáéíóú¿¡]/i,
+      'it': /[àèéìíîòóùú]/i,
+      'pl': /[ąćęłńóśźż]/i,
+      'pt': /[ãõç]/i
+    };
+    
+    for (const [lang, pattern] of Object.entries(patterns)) {
+      if (pattern.test(text)) return lang;
+    }
+    return 'en';
+  }
+
+  const voiceMap = {
+    'en': 'Google US English',
+    'de': 'Google Deutsch',
+    'fr': 'Google français',
+    'es': 'Google español',
+    'it': 'Google italiano',
+    'pl': 'Google polski',
+    'ja': 'Google 日本語',
+    'zh': 'Google 普通话（中国大陆）',
+    'ko': 'Google 한국의',
+    'ru': 'Google русский',
+    'pt': 'Google português do Brasil',
+    'uk': 'Google русский'
+  };
+
   function speakText(text) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
     
+    const detectedLang = detectLanguage(text);
     const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(v => v.name === 'Google US English');
+    const preferredVoiceName = voiceMap[detectedLang] || 'Google US English';
+    const preferredVoice = voices.find(v => v.name === preferredVoiceName) 
+      || voices.find(v => v.name === 'Google US English');
+    
     if (preferredVoice) {
       utterance.voice = preferredVoice;
     }
@@ -211,6 +252,7 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      window.speechSynthesis.cancel();
       hideTooltip();
       window.getSelection().removeAllRanges();
     }
