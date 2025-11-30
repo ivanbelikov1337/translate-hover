@@ -71,6 +71,10 @@
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.enabled) {
       isEnabled = changes.enabled.newValue;
+
+      if (!isEnabled) {
+        hideTooltip();
+      }
     }
     if (changes.targetLang) {
       targetLang = changes.targetLang.newValue;
@@ -214,7 +218,11 @@
   });
 
   async function handleSelection(e) {
-    if (!isEnabled) return;
+    // Перевіряємо чи увімкнений переклад перед будь-якою обробкою
+    if (!isEnabled) {
+      hideTooltip();
+      return;
+    }
     
     const tooltipEl = document.getElementById('hover-translate-tooltip');
     if (tooltipEl && tooltipEl.contains(e.target)) return;
